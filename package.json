@@ -1,0 +1,23 @@
+{
+  "name": "express_library_app",
+  "version": "1.0.0",
+  "description": "### Task",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cory321/express_library_app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cory321/express_library_app/issues"
+  },
+  "homepage": "https://github.com/cory321/express_library_app#readme",
+  "dependencies": {
+    "ejs": "^2.3.4",
+    "express": "^4.13.3"
+  }
+}
