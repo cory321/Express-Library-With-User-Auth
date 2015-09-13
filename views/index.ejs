@@ -28,6 +28,7 @@
 	   		<td>Title: <%= books.title %></td>
 	   		<td>Author: <%= books.author %></td>
 	   		<td>Year: <%= books.year %></td>
+	   		<td><a id="delBtn" class="btn btn-xs btn-danger" href="/books/delete/<%= books.id %>">X</a></td>
 	   </tr>
 	   <% }) %>
 	   </table>
