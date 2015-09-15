@@ -28,7 +28,8 @@
 	   		<td>Title: <%= books.title %></td>
 	   		<td>Author: <%= books.author %></td>
 	   		<td>Year: <%= books.year %></td>
-	   		<td><a id="delBtn" class="btn btn-xs btn-danger" href="/books/delete/<%= books.id %>">X</a></td>
+	   		<td><a href="/books/<%= books.id %>/edit" class="btn btn-xs btn-warning">Edit</a></td>
+	   		<td><form action="/books/<%= books.id %>?_method=delete" method= "POST"><input type="submit" value="X" class="btn btn-danger btn-xs"></form></td>
 	   </tr>
 	   <% }) %>
 	   </table>

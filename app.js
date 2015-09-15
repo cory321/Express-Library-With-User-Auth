@@ -1,70 +1,91 @@
 var express = require("express"),
+	mongoose = require("mongoose"),
+	bodyParser = require("body-parser"),
+	methodOverride = require('method-override'),
 	app = express();
 
-var books = [
-	{id:123, title: "Lord of the Rings", author: "J.R.R Tolkien", year: "1954"}
-]; 
+mongoose.connect("mongodb://localhost/books");
+mongoose.set("debug", true);
+
+var bookSchema = new mongoose.Schema({
+	title: String,
+	author: String,
+	year: Number
+});
+
+var Book = mongoose.model("Book", bookSchema);
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 
 app.get("/", function(req,res){
-	res.render("index", {books: books});
+	Book.find({}, function(err, docs) {
+		 err ? res.send(err) : res.render("index", {books: docs});
+	});
 });
 
 app.get("/books/new", function(req,res){
 	res.render("books/new");
 });
 
-app.get("/books/:id", function(req,res){
-	var id = parseInt(req.params.id);
-	var index;
+app.post("/books", function(req,res){
+	var title = req.body.title,
+	 	author = req.body.author,
+	 	year = req.body.year;
 
-	for (var i = 0; i < books.length; i++) {
-		if(books[i].id === id) {
-			index = i;
-		} 
-	}
-	res.render("books/show", books[index]);
+	 	if(isNaN(year)) {
+	 		res.redirect("/books/new");
+	 	} else {
+	 		Book.create({title: title, author: author, year: year}, function(err, book){
+ 			 err ? res.send(err) : res.redirect("/");
+ 		 	});
+	 	}
 });
 
-app.get("/books", function(req,res){
-	var id = Math.floor(Math.random()*1000),
-		title = req.query.title,
-		author = req.query.author,
-		year = req.query.year;
-
-		if(title) books.push({id: id, title: title, author: author, year: year});
-		res.redirect("/");
+app.get('/books/:id', function(req,res){
+  Book.findById(req.params.id, function(err, foundBook){
+    if(err){
+      res.send("404");
+    } else {
+      res.render('books/show', {book:foundBook});
+    }
+  });
 });
 
-app.get("/books/update/:id", function(req,res){
-	var id = parseInt(req.params.id);
-	var index;
-
-	for (var i = 0; i < books.length; i++) {
-		if(books[i].id === id) {
-			index = i;
-		} 
-	}
-	res.render("books/update", books[index]);
+app.get('/books/:id/edit', function(req,res){
+  Book.findById(req.params.id, function(err, foundBook){
+    if(err){
+      res.send("404");
+    } else {
+      res.render('books/edit', {book:foundBook});
+    }
+  });
 });
 
-app.get("/books/delete/:id", function(req,res){
-	var id = parseInt(req.params.id);
-	var index;
-
-	for (var i = 0; i < books.length; i++) {
-		if(books[i].id === id) {
-			index = i;
-		} 
-	}
-	books.splice(index, 1);
-	res.redirect("/");
+app.put('/books/:id', function(req,res){
+ Book.findByIdAndUpdate(req.params.id, req.body.book,  function(err, book){
+  if(err){
+    res.send("404");
+  } else{
+    res.redirect('/');
+  }
+ });
 });
 
-app.use(function(req, res, next){
-    res.status(404).send("<h1>404 yo!</h1>The page you are looking for does not exist! Go back <a href='/'>home</a>");
+app.delete('/books/:id', function(req,res){
+  Book.findByIdAndRemove(req.params.id, function(err, book){
+    if(err){
+      res.send("404");
+    } else{
+      res.redirect('/');
+    }
+  });
+});
+
+app.get('*', function(req,res){
+  res.send('404');
 });
 
 app.listen(3000, function(req,res){
