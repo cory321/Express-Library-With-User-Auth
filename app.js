@@ -25,7 +25,7 @@ app.get('/', routeMiddleware.ensureLoggedIn, function(req,res){
   res.redirect("/books");
 });
 
-app.get('/signup', routeMiddleware.preventLoginSignup ,function(req,res){
+app.get('/signup', routeMiddleware.preventLoginSignup, function(req,res){
   res.render('users/signup');
 });
 
