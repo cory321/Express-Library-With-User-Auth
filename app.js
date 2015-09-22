@@ -2,18 +2,11 @@ var express = require("express"),
 	mongoose = require("mongoose"),
 	bodyParser = require("body-parser"),
 	methodOverride = require('method-override'),
+  db = require("./models"),
 	app = express();
 
 mongoose.connect("mongodb://localhost/books");
 mongoose.set("debug", true);
-
-var bookSchema = new mongoose.Schema({
-	title: String,
-	author: String,
-	year: Number
-});
-
-var Book = mongoose.model("Book", bookSchema);
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
@@ -21,7 +14,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 
 app.get("/", function(req,res){
-	Book.find({}, function(err, docs) {
+	db.Book.find({}, function(err, docs) {
 		 err ? res.send(err) : res.render("index", {books: docs});
 	});
 });
@@ -38,14 +31,14 @@ app.post("/books", function(req,res){
 	 	if(isNaN(year)) {
 	 		res.redirect("/books/new");
 	 	} else {
-	 		Book.create({title: title, author: author, year: year}, function(err, book){
+	 		db.Book.create({title: title, author: author, year: year}, function(err, book){
  			 err ? res.send(err) : res.redirect("/");
  		 	});
 	 	}
 });
 
 app.get('/books/:id', function(req,res){
-  Book.findById(req.params.id, function(err, foundBook){
+  db.Book.findById(req.params.id, function(err, foundBook){
     if(err){
       res.send("404");
     } else {
@@ -55,7 +48,7 @@ app.get('/books/:id', function(req,res){
 });
 
 app.get('/books/:id/edit', function(req,res){
-  Book.findById(req.params.id, function(err, foundBook){
+  db.Book.findById(req.params.id, function(err, foundBook){
     if(err){
       res.send("404");
     } else {
@@ -65,7 +58,7 @@ app.get('/books/:id/edit', function(req,res){
 });
 
 app.put('/books/:id', function(req,res){
- Book.findByIdAndUpdate(req.params.id, req.body.book,  function(err, book){
+ db.Book.findByIdAndUpdate(req.params.id, req.body.book,  function(err, book){
   if(err){
     res.send("404");
   } else{
@@ -75,7 +68,7 @@ app.put('/books/:id', function(req,res){
 });
 
 app.delete('/books/:id', function(req,res){
-  Book.findByIdAndRemove(req.params.id, function(err, book){
+  db.Book.findByIdAndRemove(req.params.id, function(err, book){
     if(err){
       res.send("404");
     } else{
